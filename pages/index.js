@@ -1,8 +1,8 @@
 import React from "react";
-import Index from "@/components/view/Index.js";
+import Signup from "@/components/view/Signup";
 
 export default function RenderIndexPage() {
   return(
-    <Index />
+    <Signup />
   )
 }
