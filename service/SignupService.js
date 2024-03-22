@@ -7,16 +7,19 @@ export default class SignupService {
   }
 
   async createAccount(payload) {
+    console.log("service => "+payload);
     try {
       let url = "http://localhost:8080/user";
       return await HttpUtil.post(url, payload);
     } catch(error) {
       if (error.response && error.response.status === 404) {
         // Se a resposta for um erro 404, redirecionar para a página 404
-        this.router.push('/404');
+        //this.router.push('/404');
+        throw(error);
       } else {
         // Outros erros podem ser tratados de forma diferente ou simplesmente lançados novamente
-        this.router.push('/404');
+        //this.router.push('/404');
+        throw(error);
       }
     }
   }

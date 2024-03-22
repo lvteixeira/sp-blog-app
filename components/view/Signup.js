@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { useRouter } from "next/navigation.js";
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import CustomInputText from "../ui/CustomInputText.js";
 import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
 import SignupService from "@/service/SignupService.js";
+import bcrypt from 'bcryptjs';
 
 export default function Signup() {
+  const router = useRouter();
   const signupService = new SignupService();
   const usernameRegex = /^[a-z]+([.-][a-z]+)?$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,30 +24,45 @@ export default function Signup() {
       .required('Senha é obrigatória'),
   });
   const [isLoading, setIsLoading] = useState(false);
+  const toast = useRef(null);
+
   return(
     <div className="flex align-items-center justify-content-center">
         <div className="surface-card p-4 shadow-4 border-round w-full lg:w-4 mt-3" style={{height: "500px"}}>
             <div id="header-signup"className="text-center mt-2">
                 <div className="text-900 text-3xl font-medium">Crie sua conta</div>
             </div>
+            <Toast ref={toast} />
             <Formik
-              initialValues={{ username: '', email: '', secret: '' }}
+              initialValues={{ username: null, email: null, secret: null }}
               validationSchema={validationSchema}
               onSubmit={async(values, { setSubmitting }) => {
-                console.log("calling SignupService");
+                let hashedPassword = bcrypt.hashSync(values.secret, 12);
+                let payload = {
+                  username: values.username,
+                  email: values.email,
+                  password: hashedPassword,
+                }
                 setIsLoading(true);
-                await signupService.createAccount(values);
+                await signupService.createAccount(payload)
+                  .then(res => {
+                    toast.current.show({ severity: 'success', detail: 'Conta criada com sucesso.', life: 2600 });
+                    //router.push("/signin");
+                  })
+                  .catch(error => {
+                    toast.current.show({ severity: 'error', detail: error.message, life: 2600 });
+                  });
                 setIsLoading(false);
               }}
             >
-              {({ handleSubmit }) => (
+              {({ handleSubmit, values }) => (
                 <Form onSubmit={handleSubmit}>
                   <div id="form-body" className="mt-4">
                       <CustomInputText
                         name="username"
                         type="text"
                         placeholder="Escolha um nome amigável"
-                        label="Nome de Usuário" // Pass the label prop here
+                        label="Nome de Usuário"
                       />
                       <CustomInputText
                         name="email"
@@ -59,6 +78,7 @@ export default function Signup() {
                       />
                       <div>
                       <Button type="submit" label="Registrar-se"
+                        disabled={!(values.username && values.email && values.secret)}
                         loading={isLoading}
                         className="w-full shadow-2 mt-3" />
                       </div>
