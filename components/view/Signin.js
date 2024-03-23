@@ -30,7 +30,7 @@ export default function Signin() {
             await signinService.auth(payload)
               .then(res => {
                 //toast.current.show({ severity: 'success', detail: 'Autenticação bem sucedida.', life: 2600 });
-                sessionStorage.setItem('userId', res.userId);
+                sessionStorage.setItem('currentSessionId', res.userId);
                 router.push("/home");
               })
               .catch(error => {
