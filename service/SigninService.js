@@ -1,11 +1,6 @@
 import HttpUtil from "./HttpUtil.js";
-import { useRouter } from "next/router.js";
 
 export default class SigninService {
-  constructor() {
-    this.router = useRouter();
-  }
-
   async auth(payload) {
     console.log("service => "+payload);
     try {
