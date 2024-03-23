@@ -1,54 +1,40 @@
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation.js";
 import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
 import CustomInputText from "../ui/CustomInputText.js";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import SignupService from "@/service/SignupService.js";
+import SigninService from "@/service/SigninService.js";
 
-export default function Signup() {
+export default function Signin() {
   const router = useRouter();
-  const signupService = new SignupService();
-  const usernameRegex = /^[a-z]+([.-][a-z]+)?$/;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const validationSchema = Yup.object().shape({
-    username: Yup.string()
-      .matches(usernameRegex, 'Nome de usuário inválido')
-      .required('Nome de usuário é obrigatório'),
-    email: Yup.string()
-      .matches(emailRegex, 'Email inválido')
-      .required('Email é obrigatório'),
-    secret: Yup.string()
-      .required('Senha é obrigatória'),
-  });
+  const signinService = new SigninService();
   const [isLoading, setIsLoading] = useState(false);
   const toast = useRef(null);
 
   return (
     <div className="flex align-items-center justify-content-center">
       <div className="surface-card p-4 shadow-4 border-round w-full lg:w-4 mt-3" style={{ height: "500px" }}>
-        <div id="header-signup" className="text-center mt-2">
-          <div className="text-900 text-3xl font-medium">Crie sua conta</div>
+        <div id="header-signin" className="text-center mt-2">
+          <div className="text-900 text-3xl font-medium">Faça login na sua conta</div>
         </div>
         <Toast ref={toast} />
         <Formik
-          initialValues={{ username: null, email: null, secret: null }}
-          validationSchema={validationSchema}
+          initialValues={{ username: null, secret: null }}
           onSubmit={async (values, { setSubmitting }) => {
             let payload = {
               username: values.username,
-              email: values.email,
               password: values.secret,
             }
             setIsLoading(true);
-            await signupService.createAccount(payload)
+            await signinService.auth(payload)
               .then(res => {
-                toast.current.show({ severity: 'success', detail: 'Conta criada com sucesso.', life: 2600 });
-                router.push("/signin");
+                //toast.current.show({ severity: 'success', detail: 'Autenticação bem sucedida.', life: 2600 });
+                sessionStorage.setItem('userId', res.userId);
+                router.push("/home");
               })
               .catch(error => {
-                toast.current.show({ severity: 'error', detail: error.message, life: 2600 });
+                toast.current.show({ severity: 'error', detail: error.response.data, life: 2600 });
               });
             setIsLoading(false);
           }}
@@ -59,14 +45,7 @@ export default function Signup() {
                 <CustomInputText
                   name="username"
                   type="text"
-                  placeholder="Escolha um nome amigável"
                   label="Nome de Usuário"
-                />
-                <CustomInputText
-                  name="email"
-                  type="text"
-                  placeholder="Seu melhor email"
-                  label="Email"
                 />
                 <CustomInputText
                   name="secret"
@@ -75,8 +54,8 @@ export default function Signup() {
                   label="Senha"
                 />
                 <div>
-                  <Button type="submit" label="Registrar-se"
-                    disabled={!(values.username && values.email && values.secret)}
+                  <Button type="submit" label="Entrar"
+                    disabled={!(values.username && values.secret)}
                     loading={isLoading}
                     className="w-full shadow-2 mt-3" />
                 </div>
