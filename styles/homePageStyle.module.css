@@ -1,0 +1,29 @@
+/* homePageStyle.module.css */
+.timelineContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem; /* Espaçamento a partir do topo */
+}
+
+.postCard {
+  width: 100%;
+  max-width: 600px; /* Ajuste de acordo com a largura preferida */
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1); /* Sombra suave para os cards */
+}
+
+.timeline {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos adicionais para responsividade */
+@media (max-width: 768px) {
+  .postCard {
+    max-width: 100%;
+    padding: 0 1rem; /* Adiciona um pouco de padding nas laterais em telas pequenas */
+  }
+}
