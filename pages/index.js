@@ -1,8 +1,8 @@
 import React from "react";
-import Home from "@/components/view/Home.js";
+import Signin from "@/components/view/Signin";
 
 export default function RenderIndexPage() {
   return(
-    <Home />
+    <Signin />
   )
 }

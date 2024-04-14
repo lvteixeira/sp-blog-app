@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation.js";
+import Link from 'next/link';
 import { Formik, Form } from 'formik';
 import CustomInputText from "../ui/CustomInputText.js";
 import { Button } from "primereact/button";
@@ -14,9 +15,9 @@ export default function Signin() {
 
   return (
     <div className="flex align-items-center justify-content-center">
-      <div className="surface-card p-4 shadow-4 border-round w-full lg:w-4 mt-3" style={{ height: "500px" }}>
+      <div className="surface-card p-4 shadow-4 border-round w-full lg:w-4 mt-3" style={{ height: "450px" }}>
         <div id="header-signin" className="text-center mt-2">
-          <div className="text-900 text-3xl font-medium">Faça login na sua conta</div>
+          <div className="text-900 text-3xl font-medium">Login</div>
         </div>
         <Toast ref={toast} />
         <Formik
@@ -45,6 +46,7 @@ export default function Signin() {
                 <CustomInputText
                   name="username"
                   type="text"
+                  placeholder="Usuário"
                   label="Nome de Usuário"
                 />
                 <CustomInputText
@@ -53,11 +55,17 @@ export default function Signin() {
                   placeholder="Senha"
                   label="Senha"
                 />
-                <div>
+                <div className="text-center">
                   <Button type="submit" label="Entrar"
                     disabled={!(values.username && values.secret)}
                     loading={isLoading}
                     className="w-full shadow-2 mt-3" />
+                  <div className="mt-3">
+                    <p className="mb-1">Ainda não tem uma conta?</p>
+                    <Link href="/signup">
+                      <span className="text-primary">Cadastre-se</span>
+                    </Link>                    
+                  </div>
                 </div>
               </div>
             </Form>
