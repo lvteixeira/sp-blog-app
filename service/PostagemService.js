@@ -27,4 +27,17 @@ export default class PostagemService {
       }
     }
   }
+
+  async getById(id) {
+    try {
+      let url = "http://localhost:8080/postagem/"+id;
+      return await HttpUtil.get(url);
+    } catch(error) {
+      if (error.response && error.response.status === 404) {
+        throw error;
+      } else {
+        throw error;
+      }
+    }
+  }
 }
