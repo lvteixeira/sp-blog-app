@@ -19,6 +19,7 @@ export default function Homepage() {
   const [editableContent, setEditableContent] = useState('');
   const [selectedPostId, setSelectedPostId] = useState(null);
   const [showEditar, setShowEditar] = useState(false);
+  const [edited, setEdited] = useState(false);
   const toast = useRef();
   const effectRan = useRef(false);
   const router = useRouter();
@@ -55,7 +56,7 @@ export default function Homepage() {
     content !== null && await postagemService.createPostagem(payload)
       .then(res => {
         toast.current.show({ severity: 'success', detail: 'Postagem criada com sucesso', life: 2600 });
-        setContent('');
+        setContent(null);
         fetchPosts();
       })
       .catch(error => {
@@ -64,7 +65,28 @@ export default function Homepage() {
   };
 
   const saveEditedPost = async () => {
-    console.log();
+    let payload = {
+      content: editableContent,
+    }
+
+    editableContent !== null && await postagemService.updatePostagem(payload, selectedPostId)
+      .then(res => {
+        toast.current.show({ severity: 'success', detail: 'Postagem editada com sucesso', life: 2600 });
+        setContent(null);
+        setEditableContent(null);
+        setSelectedPostId(null);
+        setShowEditar(false);
+        setEdited(true);
+        fetchPosts();
+      })
+      .catch(error => {
+        console.log(error);
+        toast.current.show({ severity: 'error', detail: 'Erro ao editar postagem', life: 2600 });
+        setContent(null);
+        setEditableContent(null);
+        setSelectedPostId(null);
+        setShowEditar(false);
+      });
   }
 
   useEffect(() => {
@@ -110,6 +132,14 @@ export default function Homepage() {
     );
   };
 
+  const footerPost = () => {
+    return (
+      <div className="flex justify-content-between align-items-right">
+        {edited && <span>Editado</span>}
+      </div>
+    )
+  }
+
   const hideEditar = () => {
     setEditableContent('');
     setSelectedPostId(null);
@@ -126,7 +156,7 @@ export default function Homepage() {
         </Card>
         <Card title="Sua linha do tempo" className={homePageStyle.timeline}>
           {posts.map((post, index) => (
-            <Panel key={index} header={headerPost(post)} style={{ marginBottom: '2em' }}>
+            <Panel key={index} header={headerPost(post)} footer={footerPost()} style={{ marginBottom: '2em' }}>
               <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </Panel>
           ))}

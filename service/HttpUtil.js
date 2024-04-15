@@ -19,9 +19,19 @@ const post = async(url, payload) => {
   }
 };
 
+const put = async(url, payload) => {
+  try {
+    const response = await axios.put(url, payload);
+    return response.data;
+  } catch(error) {
+    throw error;
+  }
+}
+
 const HttpUtil = {
   get,
   post,
+  put,
 };
 
 export default HttpUtil;

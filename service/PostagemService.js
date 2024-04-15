@@ -40,4 +40,17 @@ export default class PostagemService {
       }
     }
   }
+
+  async updatePostagem(payload, id) {
+    try {
+      let url = "http://localhost:8080/postagem/"+id;
+      return await HttpUtil.put(url, payload);
+    } catch(error) {
+      if (error.response && error.response.status === 404) {
+        throw error;
+      } else {
+        throw error;
+      }
+    }
+  }
 }
