@@ -99,7 +99,7 @@ export default function Homepage() {
       <div className="flex justify-content-between align-items-center">
         <div className="flex align-items-center gap-2">
           <Avatar image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png" size="large" shape="circle" />
-          {post.username ? <span className="font-bold">{post.username}</span> : <span className="font-bold">@NoName</span>}
+          {post.username ? <span className="font-bold">{post.username}</span> : <span className="font-bold">@username</span>}
         </div>
       </div>
     );
