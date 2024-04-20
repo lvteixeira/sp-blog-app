@@ -1,17 +1,17 @@
-import HttpUtil from "./HttpUtil.js";
+import HttpUtil from "./HttpUtil";
 
 export default class SigninService {
   async auth(payload) {
-    console.log("service => "+payload);
     try {
-      let url = "http://localhost:8080/user/"+payload['username']+"/auth?password="+payload['password'];
+      const url = `http://localhost:8080/user/${encodeURIComponent(payload.username, true)}/auth?password=${encodeURIComponent(payload.password, true)}`;
       return await HttpUtil.get(url);
     } catch(error) {
-      if (error.response && error.response.status === 404) {
-        throw error;
-      } else {
-        throw error;
-      }
+      throw this.handleError(error);
     }
+  }
+
+  handleError(error) {
+    console.error("An error occurred during authentication:", error);
+    throw error;
   }
 }
