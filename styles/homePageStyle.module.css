@@ -3,27 +3,65 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 2rem; /* Espaçamento a partir do topo */
+  margin: 2rem auto; /* Centralizado na página */
+  padding: 0 1rem; /* Padding lateral para não colar nas bordas em telas menores */
 }
 
 .postCard {
   width: 100%;
-  max-width: 600px; /* Ajuste de acordo com a largura preferida */
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1); /* Sombra suave para os cards */
+  max-width: 600px;
+  margin-bottom: 2rem; /* Mais espaço entre os cartões */
+  border: 1px solid #e0e0e0; /* Bordas sutis */
+  background: #fff; /* Fundo branco para destacar do fundo da página */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* Sombra suave para profundidade */
+  padding: 1.3rem; /* Espaçamento interno */
+}
+
+.postContent {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow: auto; /* Permitir rolagem se o conteúdo for muito longo */
+  max-height: 100%;
+  margin-top: 1rem; /* Espaço acima do conteúdo */
 }
 
 .timeline {
   width: 100%;
   max-width: 600px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  border: 0.4px solid #e0e0e0;
 }
 
-/* Estilos adicionais para responsividade */
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1em;
+  margin-bottom: 1em; /* Espaço abaixo do botão */
+}
+
+/* Botão com um estilo mais moderno */
+.p-button {
+  border: none;
+  background-color: #007bff; /* Cor de destaque */
+  color: white;
+  padding: 0.75rem 1.5rem; /* Tamanho maior para facilidade de clique */
+  border-radius: 4px; /* Bordas arredondadas */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra para profundidade */
+  transition: background-color 0.3s ease-out; /* Transição suave no hover */
+}
+
+.p-button:hover {
+  background-color: #0056b3; /* Cor de hover mais escura */
+}
+
+/* Responsividade para telas menores */
 @media (max-width: 768px) {
   .postCard {
     max-width: 100%;
-    padding: 0 1rem; /* Adiciona um pouco de padding nas laterais em telas pequenas */
+    margin-bottom: 1rem;
+  }
+
+  .timelineContainer {
+    padding: 0 0.5rem; /* Menos padding nas laterais em telas menores */
   }
 }
