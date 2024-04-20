@@ -1,31 +1,30 @@
 import React, { useState, useRef } from "react";
-import { useRouter } from "next/navigation.js";
+import { useRouter } from "next/navigation";
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
-import CustomInputText from "../ui/CustomInputText.js";
+import CustomInputText from "../ui/CustomInputText";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import SignupService from "@/service/SignupService.js";
+import SignupService from "@/service/SignupService";
 
 export default function Signup() {
+  const signupService = useRef(new SignupService());
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useRef(null);
   const router = useRouter();
-  const signupService = new SignupService();
   const usernameRegex = /^[a-z]+([.-][a-z]+)?$/;
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const validationSchema = Yup.object().shape({
     username: Yup.string()
       .matches(usernameRegex, 'Nome de usuário inválido')
       .required('Nome de usuário é obrigatório'),
     email: Yup.string()
-      .matches(emailRegex, 'Email inválido')
+      .email('Email inválido')
       .required('Email é obrigatório'),
     secret: Yup.string()
       .required('Senha é obrigatória'),
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const toast = useRef(null);
 
-  return (
+  return(
     <div className="flex align-items-center justify-content-center">
       <div className="surface-card p-4 shadow-4 border-round w-full lg:w-4 mt-3" style={{ height: "500px" }}>
         <div id="header-signup" className="text-center mt-2">
@@ -33,27 +32,21 @@ export default function Signup() {
         </div>
         <Toast ref={toast} />
         <Formik
-          initialValues={{ username: null, email: null, secret: null }}
+          initialValues={{ username: '', email: '', secret: '' }}
           validationSchema={validationSchema}
           onSubmit={async (values, { setSubmitting }) => {
-            let payload = {
-              username: values.username,
-              email: values.email,
-              password: values.secret,
-            }
             setIsLoading(true);
-            await signupService.createAccount(payload)
-              .then(res => {
-                toast.current.show({ severity: 'success', detail: 'Conta criada com sucesso.', life: 2600 });
-                router.push("/signin");
-              })
-              .catch(error => {
-                toast.current.show({ severity: 'error', detail: error.message, life: 2600 });
-              });
+            try {
+              const res = await signupService.current.createAccount({ username: values.username, email: values.email, password: values.secret });
+              toast.current.show({ severity: 'success', detail: 'Conta criada com sucesso.', life: 2600 });
+              router.push("/signin");
+            } catch (error) {
+              toast.current.show({ severity: 'error', detail: error.message, life: 2600 });
+            }
             setIsLoading(false);
           }}
         >
-          {({ handleSubmit, values }) => (
+          {({ handleSubmit, values, errors, touched }) => (
             <Form onSubmit={handleSubmit}>
               <div id="form-body" className="mt-4">
                 <CustomInputText
@@ -64,7 +57,7 @@ export default function Signup() {
                 />
                 <CustomInputText
                   name="email"
-                  type="text"
+                  type="email"
                   placeholder="Seu melhor email"
                   label="Email"
                 />
@@ -76,7 +69,7 @@ export default function Signup() {
                 />
                 <div>
                   <Button type="submit" label="Registrar-se"
-                    disabled={!(values.username && values.email && values.secret)}
+                    disabled={!(values.username && values.email && values.secret) || Object.keys(errors).length !== 0}
                     loading={isLoading}
                     className="w-full shadow-2 mt-3" />
                 </div>
