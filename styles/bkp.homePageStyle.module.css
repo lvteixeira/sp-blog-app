@@ -1,0 +1,42 @@
+/* homePageStyle.module.css */
+.timelineContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.postCard {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.postContent {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow: hidden;
+  max-height: 100%;
+}
+
+.timeline {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1em;
+}
+
+/* Estilos adicionais para responsividade */
+@media (max-width: 768px) {
+  .postCard {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+}
