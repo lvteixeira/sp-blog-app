@@ -37,6 +37,15 @@ export default class PostagemService {
     }
   }
 
+  async deletePostagem(id) {
+    try {
+      const url = `${this.baseUrl}/${id}`;
+      return await HttpUtil.delete(url);
+    } catch(error) {
+      throw this.handleError(error);
+    }
+  }
+
   handleError(error) {
     if(error.response && error.response.status === 404) {
       console.error("Resource not found:", error.response);

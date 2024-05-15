@@ -37,7 +37,7 @@ export default function MenubarCustom(props) {
   const end = (
     <div className="flex align-items-center gap-2">
       <span>{props.username}</span>
-      <Avatar image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png" size="xlarge" shape="circle" />
+      <Avatar image={props.avatar} size="xlarge" shape="circle" />
     </div>
   );
 
