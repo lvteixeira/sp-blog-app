@@ -26,7 +26,8 @@ export default function Signin() {
             setIsLoading(true);
             try {
               const res = await signinService.current.auth({ username: values.username, password: values.secret });
-              sessionStorage.setItem('currentSessionId', res.userId);
+              sessionStorage.setItem('currentSessionId', res.id);
+              sessionStorage.setItem('username', res.username);
               router.push("/home");
             } catch (error) {
               toast.current.show({ severity: 'error', detail: error.response.data, life: 2600 });

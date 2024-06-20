@@ -6,14 +6,19 @@ import { Editor } from "primereact/editor";
 import { Card } from "primereact/card";
 import { Toast } from "primereact/toast";
 import { Avatar } from "primereact/avatar";
+import { AvatarGenerator } from 'random-avatar-generator';
 import PostagemService from "@/service/PostagemService";
 import homePageStyle from "@/styles/homePageStyle.module.css";
 import { Panel } from "primereact/panel";
 import { Dialog } from "primereact/dialog";
 
 export default function Homepage() {
+  const avatarGenerator = useRef(new AvatarGenerator());
   const postagemService = useRef(new PostagemService());
   const [userSessionId, setUserSessionId] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [avatar, setAvatar] = useState(null);
+  const [isAvatarDefined, setIsAvatarDefined] = useState(false);
   const [content, setContent] = useState('');
   const [posts, setPosts] = useState([]);
   const [editableContent, setEditableContent] = useState('');
@@ -27,7 +32,6 @@ export default function Homepage() {
   const fetchPosts = useCallback(async () => {
     try {
       const res = await postagemService.current.listAll();
-      console.log(res);
       setPosts(res);
     } catch (error) {
       toast.current.show({ severity: 'error', detail: 'Erro', life: 2600 });
@@ -35,7 +39,6 @@ export default function Homepage() {
   }, []);
 
   const editPost = (id) => {
-    console.log("id do post a editar: " + id);
     postagemService.current.getById(id)
       .then(res => {
         setEditableContent(res.content);
@@ -49,7 +52,7 @@ export default function Homepage() {
 
   const savePost = () => {
     if(content) {
-      postagemService.current.createPostagem({ content })
+      postagemService.current.createPostagem({ content: content, userId: userSessionId })
         .then(res => {
           toast.current.show({ severity: 'success', detail: 'Postagem criada com sucesso', life: 2600 });
           setContent('');
@@ -73,7 +76,6 @@ export default function Homepage() {
           fetchPosts();
         })
         .catch(error => {
-          console.log(error);
           toast.current.show({ severity: 'error', detail: 'Erro ao editar postagem', life: 2600 });
           setEditableContent('');
           setSelectedPostId(null);
@@ -81,6 +83,27 @@ export default function Homepage() {
         });
     }
   };
+
+  const deletePost = (id) => {
+    postagemService.current.deletePostagem(id)
+      .then(res => {
+        toast.current.show({ severity: 'success', detail: 'Postagem excluída com sucesso', life: 2600 });
+        fetchPosts();
+      })
+      .catch(error => {
+        toast.current.show({ severity: 'error', detail: 'Erro ao excluir postagem', life: 2600 });
+      });
+  }
+
+  const curtirPostagem = (postId) => {
+    postagemService.current.curtirPostagem(postId, userSessionId)
+      .then(res => {
+        fetchPosts();
+      })
+      .catch(error => {
+        console.info(error);
+      });
+  }
 
   const renderHeaderEditor = () => {
     return(
@@ -94,21 +117,32 @@ export default function Homepage() {
 
   const headerEditor = renderHeaderEditor();
 
-  const headerPost = (post) => {
+  const headerPost = (post) => {    
     return(
       <div className="flex justify-content-between align-items-center">
         <div className="flex align-items-center gap-2">
-          <Avatar image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png" size="large" shape="circle" />
-          {post.username ? <span className="font-bold">{post.username}</span> : <span className="font-bold">@username</span>}
+          <Avatar image={avatar} size="large" shape="circle" />
+          {post.username ? <span className="font-bold">@{post.username}</span> : <span className="font-bold">@username</span>}
         </div>
       </div>
     );
   };
 
   const footerPost = (post) => {
+    const isLiked = post.curtidas && post.curtidas.includes(Number(userSessionId));
     return(
-      <div className="flex justify-content-between align-items-right">
-        {post.edited && <span style={{'fontSize': '0.8em'}}>editado</span>}
+      <div className="grid w-full">
+        <div className="col-11">
+          {post.edited && <span className="font-semibold" style={{ fontSize: '0.8em' }}>editado</span>}
+        </div>
+        <div className="col-1 items-right">
+          <Button
+            size="large" 
+            icon={isLiked ? "pi pi-heart-fill" : "pi pi-heart"}
+            className={isLiked ? "p-button-rounded p-button-text p-button-danger" : "p-button-rounded p-button-text p-button-plain"}
+            tooltip="Curtir"
+            onClick={() => curtirPostagem(post.id)} />
+        </div>
       </div>
     )
   }
@@ -116,11 +150,14 @@ export default function Homepage() {
   const iconsPost = (post) => {
     return(
       <>
-        <Button icon="pi pi-pencil" className="p-button-rounded p-button-text p-button-plain"
-          onClick={() => editPost(post.id)} tooltip="Editar" />      
+        {(post.userId).toString() === userSessionId && <Button icon="pi pi-pencil" className="p-button-rounded p-button-text p-button-plain"
+          onClick={() => editPost(post.id)} tooltip="Editar" />}
+        {(post.userId).toString() === userSessionId && <Button icon="pi pi-trash" className="p-button-rounded p-button-text p-button-plain"
+          onClick={() => deletePost(post.id)} tooltip="Deletar" />}      
       </>
     )
   }
+
   const hideEditar = () => {
     setEditableContent('');
     setSelectedPostId(null);
@@ -129,11 +166,13 @@ export default function Homepage() {
 
   useEffect(() => {
     const currentSessionId = sessionStorage.getItem('currentSessionId');
+    const thisUsername = sessionStorage.getItem('username');
 
-    if(!currentSessionId) {
+    if(!currentSessionId && !username) {
       router.push('/signin');
     } else {
       setUserSessionId(currentSessionId);
+      setUsername(thisUsername);
     }
 
     if(!effectRan.current) {
@@ -142,9 +181,13 @@ export default function Homepage() {
     }
   }, [fetchPosts, router]);
 
+  useEffect(() => {
+    !isAvatarDefined && setAvatar(avatarGenerator.current.generateRandomAvatar());
+  }, [])
+
   return(
     <div>
-      <MenubarCustom username={'username'} />
+      <MenubarCustom avatar={avatar} username={username} />
       <div className={homePageStyle.timelineContainer}>
         <Card title="Criar postagem" className={homePageStyle.postCard}>
           <Editor maxLength={200} value={content} placeholder="No que você está pensando?" headerTemplate={headerEditor} onTextChange={(e) => setContent(e.htmlValue)} style={{ height: '200px' }} />
