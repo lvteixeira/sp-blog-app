@@ -46,6 +46,15 @@ export default class PostagemService {
     }
   }
 
+  async curtirPostagem(postId, userId) {
+    try {
+      const url = `${this.baseUrl}/${postId}/curtir/${userId}`;
+      return await HttpUtil.put(url);
+    } catch(error) {
+      throw this.handleError(error);
+    }
+  }
+
   handleError(error) {
     if(error.response && error.response.status === 404) {
       console.error("Resource not found:", error.response);

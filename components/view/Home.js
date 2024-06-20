@@ -95,6 +95,16 @@ export default function Homepage() {
       });
   }
 
+  const curtirPostagem = (postId) => {
+    postagemService.current.curtirPostagem(postId, userSessionId)
+      .then(res => {
+        fetchPosts();
+      })
+      .catch(error => {
+        console.info(error);
+      });
+  }
+
   const renderHeaderEditor = () => {
     return(
       <span className="ql-formats">
@@ -119,9 +129,20 @@ export default function Homepage() {
   };
 
   const footerPost = (post) => {
+    const isLiked = post.curtidas && post.curtidas.includes(Number(userSessionId));
     return(
-      <div className="flex justify-content-between align-items-right">
-        {post.edited && <span style={{'fontSize': '0.8em'}}>editado</span>}
+      <div className="grid w-full">
+        <div className="col-11">
+          {post.edited && <span className="font-semibold" style={{ fontSize: '0.8em' }}>editado</span>}
+        </div>
+        <div className="col-1 items-right">
+          <Button
+            size="large" 
+            icon={isLiked ? "pi pi-heart-fill" : "pi pi-heart"}
+            className={isLiked ? "p-button-rounded p-button-text p-button-danger" : "p-button-rounded p-button-text p-button-plain"}
+            tooltip="Curtir"
+            onClick={() => curtirPostagem(post.id)} />
+        </div>
       </div>
     )
   }
